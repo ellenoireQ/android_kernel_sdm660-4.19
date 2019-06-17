@@ -2026,8 +2026,7 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 	 */
 	if (d.rd->max_cap_orig_cpu != -1) {
 		d.rd->max_cpu_capacity.cpu = d.rd->max_cap_orig_cpu;
-		d.rd->max_cpu_capacity.val =
-			arch_scale_cpu_capacity(d.rd->max_cap_orig_cpu);
+		d.rd->max_cpu_capacity.val = arch_scale_cpu_capacity(d.rd->max_cap_orig_cpu);
 	}
 
 	rcu_read_unlock();
