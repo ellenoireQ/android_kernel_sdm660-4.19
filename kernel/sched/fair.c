@@ -9340,8 +9340,11 @@ static inline bool cfs_rq_is_decayed(struct cfs_rq *cfs_rq)
 static bool __update_blocked_fair(struct rq *rq, bool *done)
 {
 	struct cfs_rq *cfs_rq, *pos;
-	bool decayed = false;
-	int cpu = cpu_of(rq);
+	const struct sched_class *curr_class;
+	unsigned long thermal_pressure;
+
+	raw_spin_lock_irqsave(&rq->lock, flags);
+	update_rq_clock(rq);
 
 	/*
 	 * Iterates the task_group tree in a bottom up fashion, see
@@ -9374,7 +9377,15 @@ static bool __update_blocked_fair(struct rq *rq, bool *done)
 			*done = false;
 	}
 
-	return decayed;
+	curr_class = rq->curr->sched_class;
+	thermal_pressure = arch_scale_thermal_pressure(cpu_of(rq));
+	update_rt_rq_load_avg(rq_clock_pelt(rq), rq, curr_class == &rt_sched_class);
+	update_dl_rq_load_avg(rq_clock_pelt(rq), rq, curr_class == &dl_sched_class);
+	update_thermal_load_avg(rq_clock_task(rq), rq, thermal_pressure);
+	update_irq_load_avg(rq, 0);
+
+	rq->last_blocked_load_update_tick = jiffies;
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
 /*
