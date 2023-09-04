@@ -84,6 +84,8 @@
 
 #include "tune.h"
 
+#define CPU_NR		8
+
 struct rq;
 struct cpuidle_state;
 
