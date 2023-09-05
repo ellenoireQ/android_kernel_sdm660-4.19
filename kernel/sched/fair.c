@@ -8050,10 +8050,6 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 	if (sd_flag & SD_BALANCE_EXEC)
 		return prev_cpu;
 
-	if (sd_flag & SD_BALANCE_WAKE) {
-		record_wakee(p);
-	}
-
 	return find_energy_efficient_cpu(p, prev_cpu);
 }
 
