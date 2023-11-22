@@ -7641,6 +7641,8 @@ calc_energy(struct em_calc *ec, struct task_struct *p, struct perf_domain *pd,
 	    unsigned long cpu_cap, int cpu, int dst)
 {
 	unsigned int util_cfs;
+	struct rq *rq = cpu_rq(cpu);
+	unsigned long max = cpu_util_cfs(rq);
 
 	/*
 	 * The capacity state of CPUs of the current rd can be driven by CPUs of
@@ -7658,8 +7660,8 @@ calc_energy(struct em_calc *ec, struct task_struct *p, struct perf_domain *pd,
 	 * ratio (sum_util / cpu_capacity) is already enough to scale the EM
 	 * reported power consumption at the (eventually clamped) cpu_capacity.
 	 */
-	ec->energy_util = schedutil_cpu_util(cpu, util_cfs, cpu_cap,
-						       ENERGY_UTIL, NULL);
+	ec->energy_util = schedutil_cpu_util(cpu, util_cfs, &cpu_cap,
+						       &max);
 
 	/*
 	 * Performance domain frequency: utilization clamping must be considered
@@ -7667,9 +7669,8 @@ calc_energy(struct em_calc *ec, struct task_struct *p, struct perf_domain *pd,
 	 * NOTE: in case RT tasks are running, by default the FREQUENCY_UTIL's
 	 * utilization can be max OPP.
 	 */
-	ec->cpu_util = schedutil_cpu_util(cpu, util_cfs, cpu_cap,
-						    FREQUENCY_UTIL,
-						    cpu == dst ? p : NULL);
+	ec->cpu_util = schedutil_cpu_util(cpu, util_cfs, &cpu_cap,
+						    &max);
 }
 
 /*
