@@ -20,7 +20,7 @@
 #ifdef CONFIG_KSU
 #include <linux/ksu.h>
 #endif
-
+#include <linux/suspicious.h>
 #include <linux/uaccess.h>
 #include <asm/unistd.h>
 
@@ -112,6 +112,10 @@ int vfs_getattr(const struct path *path, struct kstat *stat,
 		u32 request_mask, unsigned int query_flags)
 {
 	int retval;
+
+	if (is_suspicious_path(path)) {
+		return -ENOENT;
+	}
 
 	retval = security_inode_getattr(path);
 	if (retval)
