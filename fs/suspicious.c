@@ -21,7 +21,9 @@ static const char* const suspicious_paths[] = {
 	"/system/addon.d",
 	"/vendor/bin/install-recovery.sh",
 	"/system/bin/install-recovery.sh",
-	"/debug_ramdisk"
+	"/debug_ramdisk",
+	"/data/media/0/TWRP",
+	"/data/media/0/Fox"
 };
 
 static const char* const suspicious_mount_types[] = {
