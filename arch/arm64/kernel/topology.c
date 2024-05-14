@@ -41,6 +41,14 @@
  * CPU nodes in DT. We need to just ignore this case.
  * (3) -1 if the node does not exist in the device tree
  */
+
+DECLARE_PER_CPU(unsigned long, thermal_pressure);
+
+unsigned long topology_get_thermal_pressure(int cpu)
+{
+	return per_cpu(thermal_pressure, cpu);
+}
+
 static int __init get_cpu_for_node(struct device_node *node)
 {
 	struct device_node *cpu_node;
@@ -285,6 +293,18 @@ static void update_siblings_masks(unsigned int cpuid)
 		cpumask_set_cpu(cpu, &cpuid_topo->thread_sibling);
 	}
 }
+
+DEFINE_PER_CPU(unsigned long, thermal_pressure);
+
+void arch_set_thermal_pressure(struct cpumask *cpus,
+	           unsigned long th_pressure)
+{
+	int cpu;
+
+	for_each_cpu(cpu, cpus)
+		WRITE_ONCE(per_cpu(thermal_pressure, cpu), th_pressure);
+}
+
 
 void store_cpu_topology(unsigned int cpuid)
 {

@@ -53,6 +53,7 @@ int pcibus_to_node(struct pci_bus *bus);
 
 /* Replace task scheduler's default thermal pressure retrieve API */
 #define arch_scale_thermal_pressure topology_get_thermal_pressure
+extern unsigned long topology_get_thermal_pressure(int cpu);
 
 #include <asm-generic/topology.h>
 
