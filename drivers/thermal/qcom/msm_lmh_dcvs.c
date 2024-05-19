@@ -5,6 +5,7 @@
 
 #define pr_fmt(fmt) "%s:%s " fmt, KBUILD_MODNAME, __func__
 
+#include <linux/cpufreq.h>
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/thermal.h>
@@ -140,6 +141,8 @@ static unsigned long limits_mitigation_notify(struct limits_dcvs_hw *hw)
 	struct device *cpu_dev = NULL;
 	unsigned long freq_val, max_limit = 0;
 	struct dev_pm_opp *opp_entry;
+	struct cpufreq_policy *policy;
+	unsigned long max_capacity, capacity;
 
 	val = readl_relaxed(hw->osm_hw_reg);
 	dcvsh_get_frequency(val, max_limit);
@@ -181,8 +184,15 @@ static unsigned long limits_mitigation_notify(struct limits_dcvs_hw *hw)
 		break;
 	}
 
-	if (max_cpu_ct == cpumask_weight(&hw->core_map))
-		max_limit = max_cpu_limit;
+	max_capacity = arch_scale_cpu_capacity(cpumask_first(&hw->core_map));
+	capacity = max_limit * max_capacity;
+	policy = cpufreq_cpu_get(cpumask_first(&hw->core_map));
+	if (policy) {
+		capacity /= policy->cpuinfo.max_freq;
+		cpufreq_cpu_put(policy);
+		arch_set_thermal_pressure(&hw->core_map, max_capacity - capacity);
+	}
+
 	sched_update_cpu_freq_min_max(&hw->core_map, 0, max_limit);
 	arch_set_max_thermal_scale(&hw->core_map, max_limit);
 	pr_debug("CPU:%d max limit:%lu\n", cpumask_first(&hw->core_map),
