@@ -67,6 +67,7 @@ CONFIG_PREEMPT_COUNT=y
 # Custom
 #
 CONFIG_SCHED_CASS=y
+CONFIG_USE_RBTREE_2ND=y
 
 #
 # CPU/Task time and stats accounting
