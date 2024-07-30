@@ -21,7 +21,7 @@ SCHED_FEAT(RUN_TO_PARITY, true)
 /*
  * Allow tasks with a shorter slice to disregard RUN_TO_PARITY
  */
-#define SCHED_FEAT_PREEMPT_SHORT 1
+SCHED_FEAT(PREEMPT_SHORT, true)
 
 /*
  * Prefer to schedule the task we woke last (assuming it failed
