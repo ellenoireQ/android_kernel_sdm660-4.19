@@ -8360,11 +8360,11 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 	int sync = (wake_flags & WF_SYNC) && !(current->flags & PF_EXITING);
 
 	if (sd_flag & SD_BALANCE_WAKE) {
-		int _wake_cap = wake_cap(p, cpu, prev_cpu);
+		int _wake_wide = wake_wide(p, sibling_count_hint);
 		int _cpus_allowed = cpumask_test_cpu(cpu, &p->cpus_allowed);
 
 		if (sysctl_sched_sync_hint_enable && sync && _cpus_allowed &&
-		    !_wake_cap && cpu_rq(cpu)->nr_running == 1 &&
+		    !_wake_wide && cpu_rq(cpu)->nr_running == 1 &&
 		    cpu_is_in_target_set(p, cpu)) {
 			return cpu;
 		}
