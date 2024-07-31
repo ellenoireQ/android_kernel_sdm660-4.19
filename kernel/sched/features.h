@@ -19,11 +19,6 @@ SCHED_FEAT(RUN_TO_PARITY, true)
 
 
 /*
- * Allow tasks with a shorter slice to disregard RUN_TO_PARITY
- */
-SCHED_FEAT(PREEMPT_SHORT, true)
-
-/*
  * Prefer to schedule the task we woke last (assuming it failed
  * wakeup-preemption), since its likely going to consume data we
  * touched, increases cache locality.
