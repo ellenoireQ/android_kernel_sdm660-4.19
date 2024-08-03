@@ -651,11 +651,6 @@ sugov_update_shared(struct update_util_data *hook, u64 time, unsigned int flags)
 	struct sugov_policy *sg_policy = sg_cpu->sg_policy;
 	unsigned int next_f;
 
-	if (flags & SCHED_CPUFREQ_PL)
-		return;
-
-	sg_cpu->util = sugov_get_util(sg_cpu);
-	sg_cpu->flags = flags;
 	raw_spin_lock(&sg_policy->update_lock);
 
 	sugov_iowait_boost(sg_cpu, time, flags);
