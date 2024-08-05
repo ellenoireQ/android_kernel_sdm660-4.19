@@ -174,11 +174,11 @@
 	};
     cpu0_cdev: cpu0-cdev {
         compatible = "qcom,cpu-cooling";
-        #cooling-cells = <2>; // Sesuaikan dengan jumlah cooling cells
+        #cooling-cells = <2>; 
     };
 	cpu4_cdev: cpu4-cdev {
         compatible = "qcom,cpu-cooling";
-        #cooling-cells = <2>; // Sesuaikan dengan jumlah cooling cells
+        #cooling-cells = <2>; 
     };
 };
 
