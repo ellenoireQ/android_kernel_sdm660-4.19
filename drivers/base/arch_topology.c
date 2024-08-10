@@ -17,6 +17,7 @@
 #include <linux/sched/topology.h>
 #include <linux/cpuset.h>
 
+DEFINE_PER_CPU(unsigned long, max_cpu_freq);
 DEFINE_PER_CPU(unsigned long, freq_scale) = SCHED_CAPACITY_SCALE;
 
 /*
