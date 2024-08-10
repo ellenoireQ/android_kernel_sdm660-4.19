@@ -9884,6 +9884,8 @@ static unsigned long scale_rt_capacity(int cpu)
 	return scale_irq_capacity(free, irq, max);
 }
 
+static bool sched_energy_enabled(void) { return true; }
+
 static void update_cpu_capacity(struct sched_domain *sd, int cpu)
 {
 	unsigned long capacity_orig = arch_scale_cpu_capacity(cpu);
