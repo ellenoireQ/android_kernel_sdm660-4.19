@@ -9337,8 +9337,9 @@ static inline bool cfs_rq_is_decayed(struct cfs_rq *cfs_rq)
 	return true;
 }
 
-static bool __update_blocked_fair(struct rq *rq, bool *done)
+static bool update_blocked_averages(int cpu)
 {
+	struct rq *rq = cpu_rq(cpu);
 	struct cfs_rq *cfs_rq, *pos;
 	const struct sched_class *curr_class;
 	unsigned long thermal_pressure;
@@ -9435,16 +9436,23 @@ static unsigned long task_h_load(struct task_struct *p)
 			cfs_rq_load_avg(cfs_rq) + 1);
 }
 #else
-static bool __update_blocked_fair(struct rq *rq, bool *done)
+static inline void update_blocked_averages(int cpu)
 {
+	struct rq *rq = cpu_rq(cpu);
 	struct cfs_rq *cfs_rq = &rq->cfs;
-	bool decayed;
+	unsigned long flags;
+	const struct sched_class *curr_class;
 
-	decayed = update_cfs_rq_load_avg(cfs_rq_clock_pelt(cfs_rq), cfs_rq);
-	if (cfs_rq_has_blocked(cfs_rq))
-		*done = false;
+	raw_spin_lock_irqsave(&rq->lock, flags);
+	update_rq_clock(rq);
+	update_cfs_rq_load_avg(cfs_rq_clock_pelt(cfs_rq), cfs_rq);
 
-	return decayed;
+	curr_class = rq->curr->sched_class;
+	update_rt_rq_load_avg(rq_clock_pelt(rq), rq, curr_class == &rt_sched_class);
+	update_dl_rq_load_avg(rq_clock_pelt(rq), rq, curr_class == &dl_sched_class);
+	update_irq_load_avg(rq, 0);
+	rq->last_blocked_load_update_tick = jiffies;
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
 static unsigned long task_h_load(struct task_struct *p)
@@ -9452,24 +9460,6 @@ static unsigned long task_h_load(struct task_struct *p)
 	return p->se.avg.load_avg;
 }
 #endif
-
-static void update_blocked_averages(int cpu)
-{
-	bool decayed = false, done = true;
-	struct rq *rq = cpu_rq(cpu);
-	struct rq_flags rf;
-
-	rq_lock_irqsave(rq, &rf);
-	update_rq_clock(rq);
-
-	decayed |= __update_blocked_others(rq, &done);
-	decayed |= __update_blocked_fair(rq, &done);
-
-	update_blocked_load_status(rq, !done);
-	if (decayed)
-		cpufreq_update_util(rq, 0);
-	rq_unlock_irqrestore(rq, &rf);
-}
 
 /********** Helpers for find_busiest_group ************************/
 
