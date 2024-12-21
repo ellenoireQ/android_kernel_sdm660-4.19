@@ -4269,7 +4269,7 @@ static inline void update_misfit_status(struct task_struct *p, struct rq *rq)
 #ifdef CONFIG_SCHED_WALT
 	if (task_fits_max(p, cpu_of(rq))) {
 #else
-        if (task_fits_capacity(p, cpu_of(rq))) {
+        if (task_fits_cpu(p, cpu_of(rq))) {
 #endif
 		rq->misfit_task_load = 0;
 		return;
@@ -7629,7 +7629,7 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 			#ifdef CONFIG_SCHED_WALT
 				!task_fits_capacity(p, capacity_orig, i))
 			#else
-				!task_fits_capacity(p, capacity_orig))
+				!task_fits_cpu(p, capacity_orig))
 			#endif
 
 				continue;
@@ -9608,7 +9608,7 @@ static int detach_tasks(struct lb_env *env)
 
 		case migrate_misfit:
 			/* This is not a misfit task */
-			if (task_fits_capacity(p, capacity_of(env->src_cpu)))
+			if (task_fits_cpu(p, capacity_of(env->src_cpu)))
 				goto next;
 
 			env->imbalance = 0;
