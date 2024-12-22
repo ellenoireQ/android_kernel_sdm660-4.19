@@ -1606,6 +1606,7 @@ static void update_numa_stats(struct numa_stats *ns, int nid)
 
 		ns->nr_running += rq->nr_running;
 		ns->load += weighted_cpuload(rq);
+		ns->load += cpu_runnable_load(rq);
 		ns->compute_capacity += capacity_of(cpu);
 
 		cpus++;
@@ -8342,7 +8343,6 @@ static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu,
 	int placement_boost = task_boost_policy(p);
 	#endif
 	u64 start_t = 0;
-	int delta = 0;
 	int task_boost = per_task_boost(p);
 	int boosted = (schedtune_task_boost(p) > 0) || (task_boost > 0);
 	int start_cpu;
@@ -10313,8 +10313,6 @@ static inline void update_sg_lb_stats(struct lb_env *env,
 				      int *sg_status)
 {
 	int i, nr_running, local_group;
-	int load_idx = get_sd_load_idx(env->sd, env->idle);
-	unsigned long load;
 	memset(sgs, 0, sizeof(*sgs));
 
 	local_group = cpumask_test_cpu(env->dst_cpu, sched_group_span(group));
