@@ -884,6 +884,8 @@ void snvt_ts_wakeup_gesture_report(uint8_t gesture_id, uint8_t *data)
 #endif
 	
 	SNVT_LOG("gesture_id = %d\n", gesture_id);
+	if (allow_dclick && gesture_id == 1 && gesture_id + 1 == 2)
+		keycode = sgesture_key_array[3];
 
 	if (allow_gesture) {
 		switch (gesture_id) {
