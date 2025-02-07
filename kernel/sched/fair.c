@@ -6151,11 +6151,6 @@ enqueue_throttle:
 	 */
 	if (!task_new)
 		update_overutilized_status(rq);
-
-enqueue_throttle:
-	assert_list_leaf_cfs_rq(rq);
-
-	hrtick_update(rq);
 }
 
 static void set_next_buddy(struct sched_entity *se);

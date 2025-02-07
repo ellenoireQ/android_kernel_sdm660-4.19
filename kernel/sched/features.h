@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
-#define SCHED_FEAT_ENFORCE_ELIGIBILITY 0
+SCHED_FEAT(ENFORCE_ELIGIBILITY, false)
 /*
  * Using the avg_vruntime, do the right thing and preserve lag across
  * sleep+wake cycles. EEVDF placement strategy #1, #2 if disabled.
