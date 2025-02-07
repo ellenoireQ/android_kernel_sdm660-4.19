@@ -126,13 +126,9 @@ int __weak arch_asym_cpu_priority(int cpu)
  */
 #define capacity_greater(cap1, cap2) ((cap1) * 1024 > (cap2) * 1078)
 
-
-/*
- * The margin used when comparing utilization with CPU capacity.
- *
- * (default: ~20%)
- */
-#define fits_capacity(cap, max)	((cap) * 1280 < (max) * 1024)
+bool fits_capacity(int cap, int max, int cpu) {
+    return (cap * capacity_margin_freq) > (max << SCHED_CAPACITY_SHIFT);
+}
 
 #ifdef CONFIG_CFS_BANDWIDTH
 /*
@@ -4406,7 +4402,7 @@ static inline int util_fits_cpu(unsigned long util,
 	/*
 	 * Check if the real util fits without any uclamp boost/cap applied.
 	 */
-	fits = fits_capacity(util, capacity);
+	fits = fits_capacity(util, capacity, cpu);
 
 	if (!uclamp_is_used())
 		return fits;
@@ -7757,7 +7753,7 @@ compute_energy_change(struct task_struct *p, struct perf_domain *pd, int src,
 		 * The energy model mandates all the CPUs of a performance
 		 * domain have the same capacity.
 		 */
-		cap = arch_scale_cpu_capacity(NULL, cpumask_first(pd_mask));
+		cap = arch_scale_cpu_capacity(cpumask_first(pd_mask));
 
 		/*
 		 * The cache index is 0 if @p is moving to this cluster, and 1
@@ -8109,7 +8105,6 @@ balance_fair(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 
 	return newidle_balance(rq, rf) != 0;
 }
-#endif /* CONFIG_SMP */
 
 static void set_next_buddy(struct sched_entity *se)
 {
